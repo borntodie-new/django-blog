@@ -4,13 +4,14 @@ from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse
 
-
 from utils.response import Response
 from utils.consts import *
+
 
 # 随机生成验证码背景色
 def get_random_background():
@@ -76,3 +77,13 @@ def login(request):
             return JsonResponse(response.data)
 
     return render(request, 'b-base/login.html')
+
+
+@login_required
+def index(request, *args, **kwargs):
+    user = request.user
+    print(user)
+    context = {
+        'user': user,
+    }
+    return render(request, 'b-base/index.html', context)
