@@ -1,6 +1,10 @@
 import os
+import sys
 
 from .settings import INSTALLED_APPS, BASE_DIR
+
+# 将app目录添加至项目环境变量中
+sys.path.insert(1, os.path.join(BASE_DIR, 'app'))
 
 # 注册APP
 apps = [
@@ -70,3 +74,6 @@ LOGGING = {
         },
     }
 }
+
+# 重写auth_user表必须的配置
+AUTH_USER_MODEL = 'backend.User'
