@@ -3,10 +3,14 @@ from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
 from django.conf import settings
+from django.contrib import auth
 from django.core.cache import cache
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render, reverse
 
+
+from utils.response import Response
+from utils.consts import *
 
 # 随机生成验证码背景色
 def get_random_background():
@@ -41,6 +45,34 @@ def get_code_image(request):
 
 
 def login(request):
-    if request.method == "POST":
-        pass
+    """
+    登录视图
+    :param request:
+    :return:
+    """
+    response = Response()
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        code = request.POST.get('code')
+        # 为空校验
+        if not all([username, password, code]):
+            response.set_code_and_message(PARAMS_ERR_MSG)
+            return JsonResponse(response.data)
+        # 验证码校验
+        cache_code = cache.get(settings.CODE_KEY) if cache.get(settings.CODE_KEY) else ""
+        if code.upper() != cache_code.upper():
+            response.set_code_and_message(CODE_ERR_MSG)
+            return JsonResponse(response.data)
+        # 密码校验
+        user = auth.authenticate(request, username=username, password=password)
+        if user:  # 登录成功
+            auth.login(request, user)
+            response.set_code_and_message(SUCCESS_MSG)
+            response.data['url'] = reverse('backend:index')
+            return JsonResponse(response.data)
+        else:
+            response.set_code_and_message(LOGIN_ERR_MSG)
+            return JsonResponse(response.data)
+
     return render(request, 'b-base/login.html')
