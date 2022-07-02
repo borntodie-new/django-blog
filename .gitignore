@@ -2,3 +2,4 @@
 .idea/
 media/
 logs/
+__pycache__/
