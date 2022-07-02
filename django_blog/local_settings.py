@@ -77,3 +77,18 @@ LOGGING = {
 
 # 重写auth_user表必须的配置
 AUTH_USER_MODEL = 'backend.User'
+
+# redis配置
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://192.168.226.130:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100}
+            # "PASSWORD": "123456",
+        }
+    }
+}
+CODE_KEY = 'code_key_dwjfvnksd'
+CODE_EXPIRED = 60  # 秒

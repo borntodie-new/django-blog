@@ -119,8 +119,12 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 # 导入本地配置
+STATICFILES_DIRS = []
+LOGGING = {}
+CACHES = {}
+AUTH_USER_MODEL = ''
+LOGIN_URL = ''
 try:
     from .local_settings import *
 except ImportError:
