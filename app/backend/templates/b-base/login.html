@@ -23,44 +23,44 @@
                         管理后台登录
                     </div>
                 </h2>
-                <form class="ui large form" method="post" action="#">
+                <div class="ui large form">
                     <div class="ui  segment">
                         <div class="field">
                             <div class="ui left icon input">
                                 <i class="user icon"></i>
-                                <input type="text" name="username" placeholder="用户名">
+                                <input type="text" name="username" id="username" placeholder="用户名">
                             </div>
                         </div>
                         <div class="field">
                             <div class="ui left icon input">
                                 <i class="lock icon"></i>
-                                <input type="password" name="password" placeholder="密码">
+                                <input type="password" name="password" id="password" placeholder="密码">
                             </div>
                         </div>
                         <div class="field">
                             <div class="ui grid">
                                 <div class="two column row">
                                     <div class="column">
-                                        <img src="https://unsplash.it/800/450?image=1005" alt=""
+                                        <img src="{% url 'backend:get_code_image' %}" alt=""
                                              class="ui rounded image"
                                              style="width: 166px!important;height: 36px !important;">
                                     </div>
                                     <div class="column">
                                         <div class="ui left icon input">
                                             <i class="lock icon"></i>
-                                            <input type="text" name="code" placeholder="验证码">
+                                            <input type="text" name="code" id="code" placeholder="验证码">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <button class="ui fluid large teal submit button">登 录</button>
+                        <button id="login-brn" class="ui fluid large teal submit button">登 录</button>
                     </div>
 
                     <div class="ui error mini message"></div>
-                    <div class="ui mini negative message">用户名和密码错误</div>
+                    <div class="ui mini hidden negative message"></div>
 
-                </form>
+                </div>
 
             </div>
         </div>
@@ -73,6 +73,7 @@
 
 
 <script>
+    // 表单校验
     $('.ui.form').form({
         fields: {
             username: {
@@ -98,7 +99,45 @@
             }
         }
     });
+    // 点击图片更新验证码图片
+    $('#img').click(function () {
+        $('#img').click(function () {
+            let oldVal = $(this).attr('src');
+            $(this).attr('src', oldVal + "?");
+        })
+    })
+    // 发送登录请求
+    $('#login-btn').on('click', function () {
+        $.ajax({
+            url: '{% url "backend:login" %}',
+            type: 'post',
+            data: {
+                username: $('#username').val(),
+                password: $('#password').val(),
+                code: $('#code').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (res) {
+                if (res.code === '200') {
+                    console.log(res)
+                    // 跳转到首页
+                    window.location.href = res.url;
+                } else {
+                    console.log('====', res)
+                    let errorEle = $('#error-info')[0];
+                    errorEle.setAttribute('class', 'ui mini negative message');
+                    errorEle.innerText = res.message;
+                }
+            }
+        })
+    })
+    // 给所有input框设置聚焦事件
+    $('input').on('focus', function () {
+        let errorEle = $('#error-info')[0];
+        errorEle.setAttribute('class', 'ui mini hidden negative message');
+    })
 </script>
+
 
 </body>
 </html>
